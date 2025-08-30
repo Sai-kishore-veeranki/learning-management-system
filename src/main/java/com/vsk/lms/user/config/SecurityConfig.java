@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
-
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/h2-console/**").permitAll()
 //                        .requestMatchers("/api/student/**").hasRole("STUDENT")
                         .anyRequest().authenticated()
                 )

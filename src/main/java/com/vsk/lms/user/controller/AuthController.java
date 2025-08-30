@@ -2,6 +2,7 @@ package com.vsk.lms.user.controller;
 
 
 
+import com.vsk.lms.notifications.NotificationService;
 import com.vsk.lms.user.dto.AuthRequest;
 import com.vsk.lms.user.dto.AuthResponse;
 import com.vsk.lms.user.entity.User;
@@ -21,15 +22,17 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final NotificationService notificationService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil, NotificationService notificationService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.notificationService = notificationService;
     }
 
     /** User Login */
@@ -57,6 +60,12 @@ public class AuthController {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+        notificationService.sendEmail(
+                user.getEmail(),
+                "Welcome to LMS 🎉",
+                "Hello " + user.getUsername() + ",\n\nWelcome to our Learning Management System!"
+        );
+
 
         return ResponseEntity.ok("User registered successfully");
     }

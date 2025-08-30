@@ -8,6 +8,7 @@ import com.vsk.lms.enrollment.dto.EnrollmentResponse;
 import com.vsk.lms.enrollment.entity.Enrollment;
 import com.vsk.lms.enrollment.repository.EnrollmentRepository;
 import com.vsk.lms.enrollment.service.EnrollmentService;
+import com.vsk.lms.notifications.NotificationService;
 import com.vsk.lms.user.entity.User;
 import com.vsk.lms.user.reposirtory.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     /** Enroll a student into a course */
     @Override
@@ -45,6 +47,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .build();
 
         Enrollment saved = enrollmentRepository.save(enrollment);
+        // To student
+        notificationService.sendEmail(
+                student.getEmail(),
+                "Enrollment Successful 🎓",
+                "You have successfully enrolled in the course: " + course.getTitle()
+        );
 
         return mapToResponse(saved);
     }

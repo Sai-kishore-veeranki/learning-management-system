@@ -5,6 +5,7 @@ import com.vsk.lms.course.dto.CourseResponse;
 import com.vsk.lms.course.entity.Course;
 import com.vsk.lms.course.repository.CourseRepository;
 import com.vsk.lms.course.service.CourseService;
+import com.vsk.lms.notifications.NotificationService;
 import com.vsk.lms.user.entity.User;
 import com.vsk.lms.user.reposirtory.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     public CourseResponse createCourse(CourseRequest request, String instructorUsername) {
@@ -31,6 +33,12 @@ public class CourseServiceImpl implements CourseService {
                 .price(request.getPrice())
                 .instructor(instructor)
                 .build();
+        notificationService.sendEmail(
+                instructor.getEmail(),
+                "Course Created ✅",
+                "Your course \"" + course.getTitle() + "\" has been successfully created."
+        );
+
 
         return mapToResponse(courseRepository.save(course));
     }
