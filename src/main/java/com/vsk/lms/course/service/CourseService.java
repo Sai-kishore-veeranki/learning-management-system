@@ -11,5 +11,6 @@ public interface CourseService {
     Page<CourseResponse> getAllCourses(int page, int size);
     Page<CourseResponse> filterByCategory(String category, int page, int size);
     Page<CourseResponse> filterByPrice(Double price, int page, int size);
+    CourseResponse getCourseById(Long courseId);
 }
 

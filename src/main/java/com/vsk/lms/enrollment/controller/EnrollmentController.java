@@ -1,7 +1,6 @@
 package com.vsk.lms.enrollment.controller;
 
 
-import com.vsk.lms.enrollment.dto.EnrollmentRequest;
 import com.vsk.lms.enrollment.dto.EnrollmentResponse;
 import com.vsk.lms.enrollment.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +18,13 @@ public class EnrollmentController {
     private final EnrollmentService enrollmentService;
 
 
-    @PostMapping("/{studentId}")
+    @PostMapping("/{courseId}/{studentId}/enroll")
     @PreAuthorize("hasRole('STUDENT') and #studentId.toString() == authentication.principal.id.toString()")
     public ResponseEntity<EnrollmentResponse> enroll(
-            @PathVariable Long studentId,
-            @RequestBody EnrollmentRequest request
+            @PathVariable Long courseId,
+            @PathVariable Long studentId
     ) {
-        return ResponseEntity.ok(enrollmentService.enrollStudent(studentId, request));
+        return ResponseEntity.ok(enrollmentService.enrollStudent(courseId, studentId));
     }
 
 

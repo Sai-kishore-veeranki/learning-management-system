@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
@@ -90,6 +92,12 @@ public class CourseServiceImpl implements CourseService {
                 .map(this::mapToResponse);
     }
 
+    public CourseResponse getCourseById(Long courseId){
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+        return mapToResponse(course);
+    }
+
     private CourseResponse mapToResponse(Course course) {
         return CourseResponse.builder()
                 .id(course.getId())
@@ -100,5 +108,6 @@ public class CourseServiceImpl implements CourseService {
                 .instructorName(course.getInstructor().getUsername())
                 .build();
     }
+
 }
 

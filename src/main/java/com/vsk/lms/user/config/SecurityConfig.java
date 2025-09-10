@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -50,23 +51,49 @@ public class SecurityConfig {
     }
 
     /** Security Filter Chain */
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/auth/**").permitAll()
+//                        .requestMatchers("/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+//                                .requestMatchers("/api/enrollments/**").hasRole("STUDENT")
+//                                .requestMatchers(HttpMethod.GET, "/api/lessons/**").hasAnyRole("STUDENT","INSTRUCTOR","ADMIN")
+//                                .requestMatchers(HttpMethod.POST, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
+//                                .requestMatchers(HttpMethod.PUT, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
+//                                .requestMatchers(HttpMethod.DELETE, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
+//                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/h2-console/**").permitAll()
+////                        .requestMatchers("/api/student/**").hasRole("STUDENT")
+//                        .anyRequest().authenticated()
+//                )
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authenticationProvider(authenticationProvider())
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/courses/**").hasAnyRole("INSTRUCTOR", "ADMIN")
-                                .requestMatchers("/api/enrollments/**").hasRole("STUDENT")
-                                .requestMatchers(HttpMethod.GET, "/api/lessons/**").hasAnyRole("STUDENT","INSTRUCTOR","ADMIN")
-                                .requestMatchers(HttpMethod.POST, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/lessons/**").hasAnyRole("INSTRUCTOR","ADMIN")
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**","/h2-console/**").permitAll()
-//                        .requestMatchers("/api/student/**").hasRole("STUDENT")
+                        // Specific endpoints for all authenticated users
+                        .requestMatchers(HttpMethod.GET, "/api/courses").authenticated() // CORRECTED LINE
+                        .requestMatchers("/api/courses/**").authenticated() // Corrected to allow other course-related endpoints
+                        .requestMatchers("/api/lessons/**").authenticated()
+                        // Role-based permissions
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/instructor/**").hasAnyRole("ADMIN", "INSTRUCTOR")
+                        .requestMatchers("/api/enrollments/**").authenticated()
+                        // All other requests require authentication
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

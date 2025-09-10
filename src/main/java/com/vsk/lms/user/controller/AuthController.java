@@ -8,6 +8,7 @@ import com.vsk.lms.user.dto.AuthResponse;
 import com.vsk.lms.user.entity.User;
 import com.vsk.lms.user.reposirtory.UserRepository;
 import com.vsk.lms.user.security.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -47,6 +49,7 @@ public class AuthController {
 
         // Directly use user role instead of extracting again
         String token = jwtUtil.generateToken(user.getUsername(), String.valueOf(user.getRole()));
+        log.info("user {} is login"+ user.getUsername());
         return ResponseEntity.ok(new AuthResponse(token, String.valueOf(user.getRole())));
     }
 
@@ -65,6 +68,7 @@ public class AuthController {
                 "Welcome to LMS 🎉",
                 "Hello " + user.getUsername() + ",\n\nWelcome to our Learning Management System!"
         );
+        log.info("{} is registered" + user.getUsername());
 
 
         return ResponseEntity.ok("User registered successfully");

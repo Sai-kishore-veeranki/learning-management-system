@@ -5,12 +5,14 @@ import com.vsk.lms.course.dto.CourseRequest;
 import com.vsk.lms.course.dto.CourseResponse;
 import com.vsk.lms.course.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
@@ -23,7 +25,9 @@ public class CourseController {
     public ResponseEntity<CourseResponse> createCourse(@RequestBody CourseRequest request,
                                                        Authentication authentication) {
         String instructorUsername = authentication.getName();
+        log.info("coursed created");
         return ResponseEntity.ok(courseService.createCourse(request, instructorUsername));
+
     }
 
     @PutMapping("/{id}")
@@ -66,5 +70,13 @@ public class CourseController {
                                                            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(courseService.filterByPrice(price, page, size));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseResponse> getCourseById(@PathVariable("id") Long courseId) {
+        CourseResponse response = courseService.getCourseById(courseId);
+        return ResponseEntity.ok(response);
+    }
+
+
 }
 

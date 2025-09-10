@@ -3,7 +3,6 @@ package com.vsk.lms.enrollment.service.serviceImpl;
 
 import com.vsk.lms.course.entity.Course;
 import com.vsk.lms.course.repository.CourseRepository;
-import com.vsk.lms.enrollment.dto.EnrollmentRequest;
 import com.vsk.lms.enrollment.dto.EnrollmentResponse;
 import com.vsk.lms.enrollment.entity.Enrollment;
 import com.vsk.lms.enrollment.repository.EnrollmentRepository;
@@ -28,10 +27,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     /** Enroll a student into a course */
     @Override
-    public EnrollmentResponse enrollStudent(Long studentId, EnrollmentRequest request) {
+    public EnrollmentResponse enrollStudent(Long courseId, Long studentId) {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-        Course course = courseRepository.findById(request.getCourseId())
+        Course course = courseRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
         // Prevent duplicate enrollments
